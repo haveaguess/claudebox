@@ -31,7 +31,7 @@ parse_cli_args() {
     # Single parsing loop - each arg goes into exactly ONE bucket
     local found_script_command=false
     
-    for arg in "${all_args[@]}"; do
+    for arg in ${all_args[@]+"${all_args[@]}"}; do
         if [[ " ${HOST_ONLY_FLAGS[*]} " == *" $arg "* ]]; then
             # Bucket 1: Host-only flags
             host_flags+=("$arg")
@@ -48,16 +48,16 @@ parse_cli_args() {
         fi
     done
     
-    # Export results for use by main script
-    export CLI_HOST_FLAGS=("${host_flags[@]}")
-    export CLI_CONTROL_FLAGS=("${control_flags[@]}")
-    export CLI_SCRIPT_COMMAND="$script_command"
-    export CLI_PASS_THROUGH=("${pass_through[@]}")
+    # Export results for use by main script (use safe expansion for empty arrays)
+    CLI_HOST_FLAGS=(${host_flags[@]+"${host_flags[@]}"})
+    CLI_CONTROL_FLAGS=(${control_flags[@]+"${control_flags[@]}"})
+    CLI_SCRIPT_COMMAND="$script_command"
+    CLI_PASS_THROUGH=(${pass_through[@]+"${pass_through[@]}"})
 }
 
 # Process host-only flags and set environment variables
 process_host_flags() {
-    for flag in "${CLI_HOST_FLAGS[@]}"; do
+    for flag in ${CLI_HOST_FLAGS[@]+"${CLI_HOST_FLAGS[@]}"}; do
         case "$flag" in
             --verbose)
                 export VERBOSE=true
@@ -126,10 +126,10 @@ requires_slot() {
 debug_parsed_args() {
     if [[ "${VERBOSE:-false}" == "true" ]]; then
         echo "[DEBUG] CLI Parser Results:" >&2
-        echo "[DEBUG]   Host flags: ${CLI_HOST_FLAGS[*]}" >&2
-        echo "[DEBUG]   Control flags: ${CLI_CONTROL_FLAGS[*]}" >&2
+        echo "[DEBUG]   Host flags: ${CLI_HOST_FLAGS[*]-}" >&2
+        echo "[DEBUG]   Control flags: ${CLI_CONTROL_FLAGS[*]-}" >&2
         echo "[DEBUG]   Script command: ${CLI_SCRIPT_COMMAND}" >&2
-        echo "[DEBUG]   Pass-through: ${CLI_PASS_THROUGH[*]}" >&2
+        echo "[DEBUG]   Pass-through: ${CLI_PASS_THROUGH[*]-}" >&2
     fi
 }
 
