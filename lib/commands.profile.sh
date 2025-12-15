@@ -32,7 +32,7 @@ _cmd_profiles() {
         local desc=$(get_profile_description "$profile")
         local is_enabled=false
         # Check if profile is currently enabled
-        for enabled in "${current_profiles[@]}"; do
+        for enabled in ${current_profiles[@]+"${current_profiles[@]}"}; do
             if [[ "$enabled" == "$profile" ]]; then
                 is_enabled=true
                 break
@@ -229,9 +229,9 @@ _cmd_remove() {
     # Remove specified profiles
     local new_profiles=()
     local python_profiles_removed=false
-    for profile in "${current_profiles[@]}"; do
+    for profile in ${current_profiles[@]+"${current_profiles[@]}"}; do
         local keep=true
-        for remove in "${to_remove[@]}"; do
+        for remove in ${to_remove[@]+"${to_remove[@]}"}; do
             if [[ "$profile" == "$remove" ]]; then
                 keep=false
                 # Check if we're removing a Python-related profile
@@ -246,7 +246,7 @@ _cmd_remove() {
     
     # Check if any Python-related profiles remain
     local has_python_profiles=false
-    for profile in "${new_profiles[@]}"; do
+    for profile in ${new_profiles[@]+"${new_profiles[@]}"}; do
         if [[ "$profile" == "python" ]] || [[ "$profile" == "ml" ]] || [[ "$profile" == "datascience" ]]; then
             has_python_profiles=true
             break

@@ -352,8 +352,8 @@ main() {
                 # Separate Python-only profiles from Docker-affecting profiles
                 local docker_profiles=()
                 local python_only_profiles=("python" "ml" "datascience")
-                
-                for profile in "${current_profiles[@]}"; do
+
+                for profile in ${current_profiles[@]+"${current_profiles[@]}"}; do
                     local is_python_only=false
                     for py_profile in "${python_only_profiles[@]}"; do
                         if [[ "$profile" == "$py_profile" ]]; then
@@ -537,22 +537,22 @@ build_docker_image() {
         done < <(read_profile_section "$profiles_file" "profiles")
         
         # Generate profile installations
-        for profile in "${current_profiles[@]}"; do
+        for profile in ${current_profiles[@]+"${current_profiles[@]}"}; do
             profile=$(echo "$profile" | tr -d '[:space:]')
             [[ -z "$profile" ]] && continue
-            
+
             # Convert hyphens to underscores for function names
             local profile_fn="get_profile_${profile//-/_}"
             if type -t "$profile_fn" >/dev/null; then
                 profile_installations+=$'\n'"$($profile_fn)"
             fi
         done
-        
+
         # Calculate hash only for Docker-affecting profiles
         local docker_profiles=()
         local python_only_profiles=("python" "ml" "datascience")
-        
-        for profile in "${current_profiles[@]}"; do
+
+        for profile in ${current_profiles[@]+"${current_profiles[@]}"}; do
             local is_python_only=false
             for py_profile in "${python_only_profiles[@]}"; do
                 if [[ "$profile" == "$py_profile" ]]; then
