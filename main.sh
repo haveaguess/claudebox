@@ -587,14 +587,15 @@ LABEL claudebox.project=\"$project_folder_name\""
     
     # Replace placeholders in the project template
     local final_dockerfile="$base_dockerfile"
-    
+
     # Replace WHOLE lines that contain the placeholders (with optional spaces)
+    # Note: Using environment variables instead of -v to handle multi-line strings
     local final_dockerfile
-    final_dockerfile=$(awk -v pi="$profile_installations" -v lbs="$labels" '
+    final_dockerfile=$(AWK_PI="$profile_installations" AWK_LBS="$labels" awk '
     # If the whole line is {{ PROFILE_INSTALLATIONS }}, print injected block and skip
-    /^[[:space:]]*\{\{[[:space:]]*PROFILE_INSTALLATIONS[[:space:]]*\}\}[[:space:]]*$/ { print pi; next }
+    /^[[:space:]]*\{\{[[:space:]]*PROFILE_INSTALLATIONS[[:space:]]*\}\}[[:space:]]*$/ { print ENVIRON["AWK_PI"]; next }
     # If the whole line is {{ LABELS }}, print labels block and skip
-    /^[[:space:]]*\{\{[[:space:]]*LABELS[[:space:]]*\}\}[[:space:]]*$/ { print lbs; next }
+    /^[[:space:]]*\{\{[[:space:]]*LABELS[[:space:]]*\}\}[[:space:]]*$/ { print ENVIRON["AWK_LBS"]; next }
     # Otherwise, print the line unchanged
     { print }
     ' <<<"$base_dockerfile") || error "Failed to apply Dockerfile substitutions"
