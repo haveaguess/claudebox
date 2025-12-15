@@ -30,9 +30,9 @@ preflight_check() {
                 show_no_slots_menu
                 return 1
             fi
-            
-            # For slot command, check specific slot
-            if [[ "$cmd" == "slot" ]]; then
+
+            # For slot and shell commands, just check specific slot exists (no auth required)
+            if [[ "$cmd" == "slot" ]] || [[ "$cmd" == "shell" ]]; then
                 local slot_num="${1:-}"
                 if [[ -n "$slot_num" ]]; then
                     local slot_dir=$(get_slot_dir "$PROJECT_DIR" "$slot_num" 2>/dev/null || echo "")
@@ -41,6 +41,7 @@ preflight_check() {
                         return 1
                     fi
                 fi
+                # If no slot number given, any slot is fine (determined by get_project_folder_name above)
             else
                 # For other commands, just need ANY authenticated slot
                 local has_slot=false
@@ -53,7 +54,7 @@ preflight_check() {
                         fi
                     done
                 fi
-                
+
                 if [[ "$has_slot" == "false" ]]; then
                     show_no_slots_menu
                     return 1
